@@ -12,8 +12,16 @@ dependencies = [
     "rich>=13.0",
 ]
 
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+build = ["pyinstaller>=6.0"]
+
 [project.scripts]
 dvdrip = "video_extractor.cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

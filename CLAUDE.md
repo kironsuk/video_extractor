@@ -35,5 +35,5 @@ All source is under `src/video_extractor/`. The CLI entry point is `cli.py:cli` 
 - `scanner.py` extracts JSON from HandBrakeCLI stderr after the `"JSON Title Set:"` marker line
 - `ripper.py` parses progress via regex on stderr (`Encoding: task N of N, XX.XX %`)
 - `ui.py` exports a module-level `console` singleton (Rich Console) used across all display functions
-- `drive.py` is macOS-only (diskutil, drutil, /Volumes/ scanning)
+- `drive.py` supports macOS (diskutil, drutil, /Volumes/ scanning) and Windows (wmic, drive-letter detection)
 - External tool imports (`deps`, `drive`, `scanner`, `ripper`, `ui`) are deferred to inside CLI command functions to keep startup fast and error messages clean

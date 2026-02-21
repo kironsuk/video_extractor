@@ -42,7 +42,7 @@ def scan(drive: str | None) -> None:
     # Check HandBrakeCLI
     hb = check_handbrake()
     if not hb.found:
-        show_error("HandBrakeCLI not found. Install with: brew install handbrake")
+        show_error(f"HandBrakeCLI not found. Install with: {hb.install_hint}")
         raise SystemExit(1)
 
     # Detect or use provided drive
@@ -127,10 +127,10 @@ def rip(
     dvdcss = next(d for d in deps if d.name == "libdvdcss")
 
     if not hb.found:
-        show_error("HandBrakeCLI not found. Install with: brew install handbrake")
+        show_error(f"HandBrakeCLI not found. Install with: {hb.install_hint}")
         raise SystemExit(1)
     if not dvdcss.found:
-        show_warning("libdvdcss not found. For encrypted DVDs: brew install libdvdcss")
+        show_warning(f"libdvdcss not found. For encrypted DVDs: {dvdcss.install_hint}")
 
     # 2. Detect DVD
     try:

@@ -1,8 +1,11 @@
-"""macOS DVD drive detection."""
+"""DVD drive detection (macOS and Windows)."""
 
 from __future__ import annotations
 
+import csv
+import io
 import subprocess
+import sys
 from pathlib import Path
 
 from video_extractor.models import DiscInfo
@@ -13,13 +16,83 @@ class DriveError(Exception):
 
 
 def detect_disc() -> DiscInfo:
+    """Detect a mounted DVD disc.
+
+    Dispatches to the appropriate platform-specific implementation.
+
+    Raises:
+        DriveError: If no drive, no disc, or no DVD-Video is found.
+    """
+    if sys.platform == "win32":
+        return _detect_disc_windows()
+    elif sys.platform == "darwin":
+        return _detect_disc_macos()
+    else:
+        raise DriveError(f"Unsupported platform: {sys.platform}")
+
+
+# ---------------------------------------------------------------------------
+# Windows
+# ---------------------------------------------------------------------------
+
+def _detect_disc_windows() -> DiscInfo:
+    """Detect a DVD disc on Windows using wmic."""
+    try:
+        result = subprocess.run(
+            [
+                "wmic", "logicaldisk", "where", "DriveType=5",
+                "get", "DeviceID,VolumeName", "/format:csv",
+            ],
+            capture_output=True, text=True, timeout=10,
+        )
+    except FileNotFoundError:
+        raise DriveError("wmic not found. This tool requires Windows.")
+
+    # wmic CSV output has a header row; blank lines are common.
+    drives: list[tuple[str, str]] = []
+    reader = csv.DictReader(
+        io.StringIO(result.stdout), skipinitialspace=True
+    )
+    for row in reader:
+        device_id = (row.get("DeviceID") or "").strip()
+        volume_name = (row.get("VolumeName") or "").strip()
+        if device_id:
+            drives.append((device_id, volume_name))
+
+    if not drives:
+        raise DriveError(
+            "No DVD drive found. Connect a DVD drive and insert a disc."
+        )
+
+    for device_id, volume_name in drives:
+        drive_root = Path(device_id + "\\")
+        if (drive_root / "VIDEO_TS").is_dir():
+            return DiscInfo(
+                device_path=device_id,
+                mount_point=str(drive_root),
+                volume_label=volume_name or "DVD",
+            )
+
+    # Drive exists but no VIDEO_TS
+    if drives:
+        raise DriveError(
+            "Disc is not a DVD-Video (no VIDEO_TS found)."
+        )
+
+    raise DriveError(
+        "No disc in drive. Please insert a DVD."
+    )
+
+
+# ---------------------------------------------------------------------------
+# macOS
+# ---------------------------------------------------------------------------
+
+def _detect_disc_macos() -> DiscInfo:
     """Detect a mounted DVD disc on macOS.
 
     Checks for optical media via diskutil, then verifies a VIDEO_TS directory
     exists at the mount point.
-
-    Raises:
-        DriveError: If no drive, no disc, or no DVD-Video is found.
     """
     device = _find_optical_device()
     mount_point, volume_label = _find_mount_point(device)
