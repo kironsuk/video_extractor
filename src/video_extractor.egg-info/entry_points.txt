@@ -1,0 +1,2 @@
+[console_scripts]
+dvdrip = video_extractor.cli:cli

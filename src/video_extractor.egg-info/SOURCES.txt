@@ -1,0 +1,16 @@
+pyproject.toml
+src/video_extractor/__init__.py
+src/video_extractor/__main__.py
+src/video_extractor/cli.py
+src/video_extractor/deps.py
+src/video_extractor/drive.py
+src/video_extractor/models.py
+src/video_extractor/ripper.py
+src/video_extractor/scanner.py
+src/video_extractor/ui.py
+src/video_extractor.egg-info/PKG-INFO
+src/video_extractor.egg-info/SOURCES.txt
+src/video_extractor.egg-info/dependency_links.txt
+src/video_extractor.egg-info/entry_points.txt
+src/video_extractor.egg-info/requires.txt
+src/video_extractor.egg-info/top_level.txt
