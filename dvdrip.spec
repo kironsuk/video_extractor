@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for building dvdrip.exe (Windows single-file)."""
+"""PyInstaller spec for building a standalone dvdrip executable."""
 
 a = Analysis(
     ["src/video_extractor/__main__.py"],
@@ -19,7 +19,38 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        # Scientific / data libraries
+        "numpy",
+        "PIL",
+        "Pillow",
+        "matplotlib",
+        "pandas",
+        "scipy",
+        # Jupyter / IPython ecosystem
+        "IPython",
+        "jupyter",
+        "notebook",
+        "tornado",
+        "zmq",
+        "traitlets",
+        # GUI toolkits
+        "tkinter",
+        "_tkinter",
+        # Build / packaging tools
+        "setuptools",
+        "pkg_resources",
+        "distutils",
+        "pip",
+        # Test frameworks
+        "unittest",
+        "pytest",
+        "test",
+        # Other unneeded packages
+        "psutil",
+        "pycparser",
+        "cffi",
+    ],
     noarchive=False,
 )
 
