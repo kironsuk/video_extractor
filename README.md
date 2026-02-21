@@ -83,6 +83,76 @@ dvdrip rip --main-feature --audio-lang eng --subtitle-lang eng
 | `--audio-lang` | Preferred audio language code (e.g. `eng`) |
 | `--subtitle-lang` | Subtitle language to include (e.g. `eng`) |
 
+## Using HandBrakeCLI directly
+
+If you prefer to use HandBrakeCLI without dvdrip, here are the raw commands.
+
+### Scan the disc to see all titles
+
+**macOS:**
+```bash
+HandBrakeCLI -i /dev/disk4 -t 0 --scan
+```
+Replace `/dev/disk4` with your optical drive — run `diskutil list` to find it.
+
+**Windows:**
+```powershell
+HandBrakeCLI -i D: -t 0 --scan
+```
+
+### Rip a specific title
+
+**macOS:**
+```bash
+HandBrakeCLI -i /dev/disk4 -t 1 -o ~/Movies/movie.mkv \
+  --format av_mkv \
+  --encoder x265 \
+  --quality 20 \
+  --audio 1 \
+  --aencoder copy
+```
+
+**Windows:**
+```powershell
+HandBrakeCLI -i D: -t 1 -o C:\Videos\movie.mkv `
+  --format av_mkv `
+  --encoder x265 `
+  --quality 20 `
+  --audio 1 `
+  --aencoder copy
+```
+
+### Rip all audio and subtitle tracks
+
+```bash
+HandBrakeCLI -i /dev/disk4 -t 1 -o movie.mkv \
+  --format av_mkv \
+  --encoder x265 \
+  --quality 20 \
+  --all-audio \
+  --all-subtitles
+```
+
+### Key flags
+
+| Flag | What it does |
+|---|---|
+| `-i` | Input source (drive device path) |
+| `-t` | Title number (`0` = scan all, `1`+ = rip that title) |
+| `-o` | Output file path |
+| `--format` | `av_mkv` or `av_mp4` |
+| `--encoder` | `x265` (smaller files) or `x264` (more compatible) |
+| `--quality` | RF value: 18-22 is typical (lower = better quality, bigger file) |
+| `--audio` | Audio track numbers (comma-separated, e.g. `1,2`) |
+| `--aencoder` | `copy` keeps original audio, or `av_aac` to re-encode |
+| `--subtitle` | Subtitle track numbers (e.g. `1`) |
+
+### Notes
+
+- **libdvdcss** is required for encrypted/commercial DVDs — without it HandBrakeCLI will fail to read the disc
+- Quality 20 is a good default. Use 18 for higher quality, 22 for smaller files
+- `x264` is more widely compatible; `x265` gives ~30% smaller files at the same quality
+
 ## Development
 
 ```bash
